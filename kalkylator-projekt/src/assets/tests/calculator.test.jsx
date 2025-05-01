@@ -17,3 +17,26 @@ function Calculator() {
         setResultat("Ogiltiga värden");
         return;
       }
+
+      switch (operator) {
+        case "+":
+          setResultat(a + b);
+          break;
+        case "-":
+          setResultat(a - b);
+          break;
+        case "*":
+          setResultat(a * b);
+          break;
+        case "/":
+          if (b === 0) {
+            setResultat("Kan inte dividera med 0!");
+          } else {
+            setResultat(a / b);
+          }
+          break;
+        default:
+          setResultat("Okänd operator");
+      }
+    };
+  
