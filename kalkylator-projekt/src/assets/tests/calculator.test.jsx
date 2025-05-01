@@ -12,3 +12,8 @@ function Calculator() {
   const beräkna = () => {
     const a = Number(tal1);
     const b = Number(tal2);
+
+    if (isNaN(a) || isNaN(b)) {
+        setResultat("Ogiltiga värden");
+        return;
+      }
