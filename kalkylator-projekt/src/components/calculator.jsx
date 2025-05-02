@@ -1,5 +1,6 @@
 import { useState } from "react";
-import "./Calculator.css";
+import React from "react";
+import "./calculator.css";
 
 function Calculator() {
   const [tal1, setTal1] = useState("");

@@ -1,75 +1,60 @@
-import { useState } from "react";
-import "./Calculator.css";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { expect, describe, it } from "vitest";
+import React from "react";
+import Calculator from "../components/Calculator";
 
+describe("Calculator", () => {
+  it("lägger ihop två tal korrekt", () => {
+    render(<Calculator />);
 
-function Calculator() {
-    const [tal1, setTal1] = useState("");
-    const [tal2, setTal2] = useState("");
-    const [operator, setOperator] = useState("+");
-    const [resultat, setResultat] = useState(null);
+    const input1 = screen.getByPlaceholderText("Tal 1");
+    fireEvent.change(input1, { target: { value: "5" } });
 
-    
-  const beräkna = () => {
-    const a = Number(tal1);
-    const b = Number(tal2);
+    const input2 = screen.getByPlaceholderText("Tal 2");
+    fireEvent.change(input2, { target: { value: "3" } });
 
-    if (isNaN(a) || isNaN(b)) {
-        setResultat("Ogiltiga värden");
-        return;
-      }
+    const select = screen.getByRole("combobox");
+    fireEvent.change(select, { target: { value: "+" } });
 
-      switch (operator) {
-        case "+":
-          setResultat(a + b);
-          break;
-        case "-":
-          setResultat(a - b);
-          break;
-        case "*":
-          setResultat(a * b);
-          break;
-        case "/":
-          if (b === 0) {
-            setResultat("Kan inte dividera med 0!");
-          } else {
-            setResultat(a / b);
-          }
-          break;
-        default:
-          setResultat("Okänd operator");
-      }
-    };
-    return (
-        <div className="calculator">
-          <h1>Kalkylator</h1>
-          <p>Skriv in två tal och välj ett räknesätt:</p>
-    
-          <input
-            type="number"
-            placeholder="Tal 1"
-            value={tal1}
-            onChange={(e) => setTal1(e.target.value)}
-          />
-    
-          <select value={operator} onChange={(e) => setOperator(e.target.value)}>
-            <option value="+">Addera</option>
-            <option value="-">Subtrahera</option>
-            <option value="*">Multiplicera</option>
-            <option value="/">Dividera</option>
-          </select>
-    
-          <input
-            type="number"
-            placeholder="Tal 2"
-            value={tal2}
-            onChange={(e) => setTal2(e.target.value)}
-          />
-    
-          <button onClick={beräkna}>Beräkna</button>
-    
-          <h2>Resultat: {resultat !== null ? resultat : "-"}</h2>
-        </div>
-      );
-    }
-    
-    export default Calculator;
+    const button = screen.getByRole("button", { name: /beräkna/i });
+    fireEvent.click(button);
+
+    const result = screen.getByText(/Resultat:/);
+    expect(result.textContent).toBe("Resultat: 8");
+  });
+
+  it("hanterar ogiltiga värden", () => {
+    render(<Calculator />);
+
+    const input1 = screen.getByPlaceholderText("Tal 1");
+    fireEvent.change(input1, { target: { value: "abc" } });
+
+    const input2 = screen.getByPlaceholderText("Tal 2");
+    fireEvent.change(input2, { target: { value: "xyz" } });
+
+    const button = screen.getByRole("button", { name: /beräkna/i });
+    fireEvent.click(button);
+
+    const result = screen.getByText(/Resultat:/);
+    expect(result.textContent).toBe("Resultat: 0");
+  });
+
+  it("hanterar division med noll", () => {
+    render(<Calculator />);
+
+    const input1 = screen.getByPlaceholderText("Tal 1");
+    fireEvent.change(input1, { target: { value: "5" } });
+
+    const input2 = screen.getByPlaceholderText("Tal 2");
+    fireEvent.change(input2, { target: { value: "0" } });
+
+    const select = screen.getByRole("combobox");
+    fireEvent.change(select, { target: { value: "/" } });
+
+    const button = screen.getByRole("button", { name: /beräkna/i });
+    fireEvent.click(button);
+
+    const result = screen.getByText(/Resultat:/);
+    expect(result.textContent).toBe("Resultat: Kan inte dividera med 0!");
+  });
+});
